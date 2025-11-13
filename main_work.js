@@ -11,7 +11,6 @@ let currentColor = '#e74c3c';
 let sweepProgress = 0;
 let sweepInterval;
 let returnUpdateInterval;
-let lastEndY = null;
 
 // Resize canvas
 function resizeCanvas() {
@@ -30,12 +29,16 @@ function generatePath() {
     const endX = canvas.width * 0.8;
     const lineWidth = endX - startX;
 
+    // Always start at random mid range (40-60% of screen height)
+    const startY = canvas.height * (0.4 + Math.random() * 0.2);
+
     // Determine trend based on color
-    const trend = currentColor === '#e74c3c' ? 1 : -1;
+    // Red (positive) = line goes UP on screen = Y decreases = trend is negative
+    // Green (negative) = line goes DOWN on screen = Y increases = trend is positive
+    const trend = currentColor === '#e74c3c' ? -1 : 1;
     const trendStrength = 150;
 
-    // Continue from last endpoint for smooth transition, or start from center
-    let currentY = lastEndY !== null ? lastEndY : centerY;
+    let currentY = startY;
 
     for (let i = 0; i <= segments; i++) {
         const x = startX + (lineWidth / segments) * i;
@@ -43,17 +46,14 @@ function generatePath() {
         const trendOffset = (i / segments) * trend * trendStrength;
 
         currentY += variation;
-        const targetY = centerY - trendOffset;
+        const targetY = startY + trendOffset;
 
         // Keep within bounds and drift toward trend line
-        currentY = Math.max(centerY - 350, Math.min(centerY + 350, currentY));
+        currentY = Math.max(50, Math.min(canvas.height - 50, currentY));
         currentY += (targetY - currentY) * 0.08;
 
         points.push({x, y: currentY});
     }
-
-    // Save the endpoint for the next sweep
-    lastEndY = points[points.length - 1].y;
 }
 
 resizeCanvas();
@@ -290,7 +290,6 @@ function stopAnimation() {
     clearInterval(returnUpdateInterval);
     currentColor = '#e74c3c';
     sweepProgress = 0;
-    lastEndY = null;
 }
 
 workLink.addEventListener('mouseenter', startAnimation);
