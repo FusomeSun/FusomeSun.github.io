@@ -3,6 +3,56 @@ const ctx = canvas.getContext('2d');
 const workLink = document.getElementById('work-link');
 const returnDisplaysContainer = document.getElementById('return-displays-container');
 const returnDisplays = [];
+const codeDisplaysContainer = document.getElementById('code-displays-container');
+const codeDisplays = [];
+
+// AI training related code snippets
+const codeSnippets = [
+    'model.fit(X_train, y_train)',
+    'loss.backward()',
+    'optimizer.step()',
+    'transformer = GPT2Model()',
+    'epochs = 100',
+    'learning_rate = 0.001',
+    'batch_size = 32',
+    'accuracy = 0.95',
+    'loss = criterion(outputs, labels)',
+    'torch.cuda.is_available()',
+    'model.eval()',
+    'dropout = 0.5',
+    'embedding_dim = 512',
+    'attention_heads = 8',
+    'layer_norm(x)',
+    'cross_entropy_loss()',
+    'gradient_clipping = 1.0',
+    'warmup_steps = 1000',
+    'from transformers import AutoModel',
+    'neural_network.train()',
+    'tensor = torch.randn(64, 128)',
+    'optimizer = Adam(lr=1e-4)',
+    'softmax = nn.Softmax(dim=1)',
+    'forward_pass(input)',
+    'backprop_through_time()',
+    'checkpoint.save()',
+    'val_loss = evaluate(model)',
+    'tokenizer.encode(text)',
+    'attention = scaled_dot_product()',
+    'hidden_state = lstm(input)',
+    'gradient_descent(params)',
+    'loss_fn = MSELoss()',
+    'dataset = load_dataset()',
+    'num_layers = 12',
+    'vocab_size = 50000',
+    'max_seq_length = 512',
+    'fine_tune(pretrained_model)',
+    'predictions = model.predict(X)',
+    'confusion_matrix(y_true, y_pred)',
+    'f1_score = metrics.f1_score()',
+    'early_stopping = EarlyStopping()',
+    'scheduler.step()',
+    'weight_decay = 0.01',
+    'temperature = 0.7'
+];
 
 let animationFrame;
 let isAnimating = false;
@@ -22,7 +72,7 @@ function resizeCanvas() {
 function generatePath() {
     points = [];
     const centerY = canvas.height / 2;
-    const segments = 20;
+    const segments = 30;
 
     // Start at 20% and end at 80% of canvas width
     const startX = canvas.width * 0.2;
@@ -42,7 +92,7 @@ function generatePath() {
 
     for (let i = 0; i <= segments; i++) {
         const x = startX + (lineWidth / segments) * i;
-        const variation = (Math.random() - 0.5) * 220;
+        const variation = (Math.random() - 0.5) * 180;
         const trendOffset = (i / segments) * trend * trendStrength;
 
         currentY += variation;
@@ -50,7 +100,7 @@ function generatePath() {
 
         // Keep within bounds and drift toward trend line
         currentY = Math.max(50, Math.min(canvas.height - 50, currentY));
-        currentY += (targetY - currentY) * 0.08;
+        currentY += (targetY - currentY) * 0.12;
 
         points.push({x, y: currentY});
     }
@@ -184,6 +234,102 @@ function createReturnDisplays() {
     }
 }
 
+function createCodeDisplays() {
+    // Clear any existing displays first
+    codeDisplaysContainer.innerHTML = '';
+    codeDisplays.length = 0;
+
+    // Create 14-16 code displays at random positions
+    const count = Math.floor(Math.random() * 3) + 14;
+    const allPositions = [];
+
+    // Get positions of return displays to avoid overlap
+    returnDisplays.forEach(display => {
+        const left = parseFloat(display.style.left);
+        const top = parseFloat(display.style.top);
+        allPositions.push({x: left, y: top});
+    });
+
+    const minDistance = 15; // Minimum distance in percentage
+
+    for (let i = 0; i < count; i++) {
+        let x, y, attempts = 0;
+        let validPosition = false;
+
+        // Try to find a valid position that doesn't overlap
+        while (!validPosition && attempts < 50) {
+            x = Math.random() * 100;
+            y = Math.random() * 100;
+
+            // Avoid center area (25-75% of screen) - larger exclusion zone
+            if ((x < 25 || x > 75) || (y < 25 || y > 75)) {
+                // Position is in valid area
+            } else {
+                // Push to edges
+                x = x < 50 ? x * 0.25 : 75 + (x - 75) * 0.25;
+                y = y < 50 ? y * 0.25 : 75 + (y - 75) * 0.25;
+            }
+
+            // Check distance from all existing positions (return displays + code displays)
+            validPosition = true;
+            for (const pos of allPositions) {
+                const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
+                if (distance < minDistance) {
+                    validPosition = false;
+                    break;
+                }
+            }
+
+            attempts++;
+        }
+
+        if (validPosition) {
+            const div = document.createElement('div');
+            div.className = 'code-display';
+            div.style.left = x + '%';
+            div.style.top = y + '%';
+
+            // Random code snippet
+            const snippet = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+            div.dataset.fullText = snippet;
+            div.textContent = '';
+
+            codeDisplaysContainer.appendChild(div);
+            codeDisplays.push(div);
+            allPositions.push({x, y});
+        }
+    }
+}
+
+function typewriterEffect() {
+    codeDisplays.forEach((display, index) => {
+        // Clear any existing interval
+        if (display.typeInterval) {
+            clearInterval(display.typeInterval);
+        }
+
+        // Pick a new random code snippet
+        const snippet = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+        display.dataset.fullText = snippet;
+        display.textContent = '';
+
+        const fullText = display.dataset.fullText;
+        let currentCharIndex = 0;
+
+        const typeInterval = setInterval(() => {
+            if (currentCharIndex < fullText.length && isAnimating) {
+                display.textContent = fullText.substring(0, currentCharIndex + 1);
+                currentCharIndex++;
+            } else {
+                clearInterval(typeInterval);
+            }
+        }, 50 + Math.random() * 30); // Random speed between 50-80ms per character
+
+        // Store interval for cleanup
+        display.typeInterval = typeInterval;
+    });
+}
+
 function updateReturnRate() {
     // Update all return displays
     returnDisplays.forEach(display => {
@@ -222,7 +368,7 @@ function sweep() {
         }
     }, 400);
 
-    const duration = 1500;
+    const duration = 2300;
     const startTime = Date.now();
 
     function updateSweep() {
@@ -244,6 +390,9 @@ function pump() {
     currentColor = Math.random() > 0.5 ? '#e74c3c' : '#2ecc71';
 
     sweep();
+
+    // Retype code displays with new random snippets
+    typewriterEffect();
 }
 
 function startAnimation() {
@@ -258,17 +407,29 @@ function startAnimation() {
     // Create return displays
     createReturnDisplays();
 
+    // Create code displays
+    createCodeDisplays();
+
     // Show all displays immediately
     returnDisplays.forEach(display => {
         display.classList.add('active');
     });
 
+    codeDisplays.forEach(display => {
+        display.classList.add('active');
+    });
+
+    // Start typewriter effect for code displays
+    setTimeout(() => {
+        typewriterEffect();
+    }, 100);
+
     // Start animation and set initial content
     animate();
     pump();
 
-    // Pump every 1.5 seconds
-    sweepInterval = setInterval(pump, 1500);
+    // Pump every 2.3 seconds
+    sweepInterval = setInterval(pump, 2300);
 }
 
 function stopAnimation() {
@@ -280,9 +441,19 @@ function stopAnimation() {
         display.classList.remove('active');
     });
 
+    codeDisplays.forEach(display => {
+        display.classList.remove('active');
+        // Clear typewriter interval
+        if (display.typeInterval) {
+            clearInterval(display.typeInterval);
+        }
+    });
+
     setTimeout(() => {
         returnDisplaysContainer.innerHTML = '';
         returnDisplays.length = 0;
+        codeDisplaysContainer.innerHTML = '';
+        codeDisplays.length = 0;
     }, 300);
 
     cancelAnimationFrame(animationFrame);
