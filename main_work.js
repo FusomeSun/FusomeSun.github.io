@@ -92,7 +92,7 @@ function generatePath() {
 
     for (let i = 0; i <= segments; i++) {
         const x = startX + (lineWidth / segments) * i;
-        const variation = (Math.random() - 0.5) * 180;
+        const variation = (Math.random() - 0.5) * 220;
         const trendOffset = (i / segments) * trend * trendStrength;
 
         currentY += variation;
@@ -100,7 +100,7 @@ function generatePath() {
 
         // Keep within bounds and drift toward trend line
         currentY = Math.max(50, Math.min(canvas.height - 50, currentY));
-        currentY += (targetY - currentY) * 0.12;
+        currentY += (targetY - currentY) * 0.08;
 
         points.push({x, y: currentY});
     }
@@ -402,6 +402,9 @@ function startAnimation() {
     // Randomize initial color
     currentColor = Math.random() > 0.5 ? '#e74c3c' : '#2ecc71';
 
+    // Change background to gray
+    document.body.style.backgroundColor = '#d0d0d0';
+
     canvas.classList.add('active');
 
     // Create return displays
@@ -434,6 +437,10 @@ function startAnimation() {
 
 function stopAnimation() {
     isAnimating = false;
+
+    // Change background back to white
+    document.body.style.backgroundColor = '#ffffff';
+
     canvas.classList.remove('active');
 
     // Hide and remove all displays
