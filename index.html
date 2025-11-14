@@ -244,6 +244,76 @@
                 color: #ffffff;
             }
         }
+
+        /* Mobile responsive design */
+        @media (max-width: 768px) {
+            .header {
+                top: 1rem;
+                left: 1rem;
+                gap: 1rem;
+            }
+
+            .icon {
+                width: 32px;
+                height: 32px;
+            }
+
+            nav {
+                gap: 1rem;
+            }
+
+            nav a {
+                font-size: 1rem;
+            }
+
+            .top-controls {
+                top: 1rem;
+                right: 1rem;
+                gap: 1rem;
+            }
+
+            .theme-toggle {
+                font-size: 1.2rem;
+            }
+
+            .lang-toggle {
+                font-size: 0.85rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                gap: 0.5rem;
+            }
+
+            nav {
+                gap: 0.75rem;
+            }
+
+            nav a {
+                font-size: 0.9rem;
+            }
+
+            .top-controls {
+                gap: 0.75rem;
+            }
+
+            .theme-toggle {
+                font-size: 1.1rem;
+            }
+
+            .lang-toggle {
+                font-size: 0.75rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
     </style>
 </head>
 <body>

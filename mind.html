@@ -156,6 +156,51 @@
             font-weight: 300;
             margin-bottom: 2rem;
         }
+
+        /* Mobile responsive design */
+        @media (max-width: 768px) {
+            .header {
+                top: 1rem;
+                left: 1rem;
+            }
+
+            .icon {
+                width: 32px;
+                height: 32px;
+            }
+
+            .top-controls {
+                top: 1rem;
+                right: 1rem;
+                gap: 1rem;
+            }
+
+            .theme-toggle {
+                font-size: 1.2rem;
+            }
+
+            .lang-toggle {
+                font-size: 0.85rem;
+            }
+
+            .content {
+                padding: 80px 15px 30px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .top-controls {
+                gap: 0.75rem;
+            }
+
+            .theme-toggle {
+                font-size: 1.1rem;
+            }
+
+            .lang-toggle {
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>
