@@ -77,6 +77,12 @@
         .icon {
             width: 40px;
             height: 40px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .icon:hover {
+            transform: scale(1.1);
         }
 
         .content {
@@ -95,6 +101,15 @@
             color: #000000;
             margin: 0;
             letter-spacing: 0.5px;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        h1.highlight {
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        body[data-theme="dark"] h1.highlight {
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -237,7 +252,7 @@
     <div id="code-displays-container"></div>
 
     <div class="header">
-        <img src="icon.png" alt="Icon" class="icon">
+        <a href="index.html"><img src="icon.png" alt="Icon" class="icon"></a>
         <nav>
             <a href="work.html" id="work-link" data-en="Work" data-zh="工作">Work</a>
             <a href="life.html" data-en="Life" data-zh="生活">Life</a>
@@ -302,14 +317,34 @@
         });
 
         // Language toggle
-        let currentLang = 'en';
         const langToggle = document.getElementById('lang-toggle');
+
+        // Initialize language from localStorage or default to 'en'
+        let currentLang = localStorage.getItem('language') || 'en';
+
+        // Apply initial language
+        mainTitle.textContent = mainTitle.dataset[currentLang];
+        navLinks.forEach(link => {
+            link.textContent = link.dataset[currentLang];
+        });
 
         langToggle.addEventListener('click', () => {
             currentLang = currentLang === 'en' ? 'zh' : 'en';
             mainTitle.textContent = mainTitle.dataset[currentLang];
             navLinks.forEach(link => {
                 link.textContent = link.dataset[currentLang];
+            });
+            // Save language preference
+            localStorage.setItem('language', currentLang);
+        });
+
+        // Highlight title on nav hover
+        navLinks.forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                mainTitle.classList.add('highlight');
+            });
+            link.addEventListener('mouseleave', () => {
+                mainTitle.classList.remove('highlight');
             });
         });
     </script>
