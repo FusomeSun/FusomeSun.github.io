@@ -223,21 +223,26 @@
             cursor: pointer;
             transition: color 0.3s ease;
             user-select: none;
+            -webkit-text-fill-color: #666666; /* Force color on iOS Safari */
+            font-variant-emoji: text; /* Use text rendering instead of emoji color */
         }
 
         @media (prefers-color-scheme: dark) {
             .theme-toggle {
                 color: #999999;
+                -webkit-text-fill-color: #999999;
             }
         }
 
         .theme-toggle:hover {
             color: #000000;
+            -webkit-text-fill-color: #000000;
         }
 
         @media (prefers-color-scheme: dark) {
             .theme-toggle:hover {
                 color: #ffffff;
+                -webkit-text-fill-color: #ffffff;
             }
         }
 
