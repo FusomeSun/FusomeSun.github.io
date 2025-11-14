@@ -402,8 +402,8 @@ function startAnimation() {
     // Randomize initial color
     currentColor = Math.random() > 0.5 ? '#e74c3c' : '#2ecc71';
 
-    // Change background to gray
-    document.body.style.backgroundColor = '#d0d0d0';
+    // Set animating state - CSS will handle background color based on theme
+    document.body.setAttribute('data-animating', 'true');
 
     canvas.classList.add('active');
 
@@ -438,8 +438,8 @@ function startAnimation() {
 function stopAnimation() {
     isAnimating = false;
 
-    // Change background back to white
-    document.body.style.backgroundColor = '#ffffff';
+    // Remove animating state - CSS will restore theme background color
+    document.body.removeAttribute('data-animating');
 
     canvas.classList.remove('active');
 

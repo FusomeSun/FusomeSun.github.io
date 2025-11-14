@@ -10,15 +10,37 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
             background-color: #ffffff;
-            transition: background-color 0.5s ease-in-out;
+            color: #000000;
+            transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
             position: relative;
             overflow: hidden;
+        }
+
+        body[data-theme="dark"] {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+        }
+
+        body[data-theme="light"] {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        body[data-animating="true"][data-theme="dark"] {
+            background-color: #2a2a2a !important;
+        }
+
+        body[data-animating="true"][data-theme="light"] {
+            background-color: #d0d0d0 !important;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body:not([data-theme]) {
+                background-color: #1a1a1a;
+                color: #ffffff;
+            }
         }
 
         #canvas-bg {
@@ -36,35 +58,75 @@
             opacity: 1;
         }
 
+        .header {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            z-index: 10;
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+        }
+
         .content {
             position: relative;
             z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transform: translateY(-80px);
+            justify-content: center;
+            min-height: 100vh;
         }
 
         h1 {
             font-size: 4rem;
             font-weight: 400;
             color: #000000;
-            margin-bottom: 3rem;
+            margin: 0;
             letter-spacing: 0.5px;
         }
-        nav {
-            display: flex;
-            gap: 4rem;
+
+        @media (prefers-color-scheme: dark) {
+            h1 {
+                color: #ffffff;
+            }
         }
+
         nav a {
             font-size: 1.5rem;
             color: #666666;
             text-decoration: none;
             transition: color 0.3s ease;
             position: relative;
+            cursor: pointer;
+            pointer-events: auto;
         }
+
+        @media (prefers-color-scheme: dark) {
+            nav a {
+                color: #999999;
+            }
+        }
+
         nav a:hover {
             color: #000000;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            nav a:hover {
+                color: #ffffff;
+            }
         }
 
         .return-display {
@@ -96,8 +158,76 @@
             transform-origin: left center;
         }
 
+        body[data-theme="dark"] .code-display {
+            color: #eeeeee;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body:not([data-theme]) .code-display {
+                color: #eeeeee;
+            }
+        }
+
         .code-display.active {
             opacity: 0.7;
+        }
+
+        .top-controls {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            font-size: 1.5rem;
+            color: #666666;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .theme-toggle {
+                color: #999999;
+            }
+        }
+
+        .theme-toggle:hover {
+            color: #000000;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .theme-toggle:hover {
+                color: #ffffff;
+            }
+        }
+
+        .lang-toggle {
+            font-size: 1rem;
+            color: #666666;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .lang-toggle {
+                color: #999999;
+            }
+        }
+
+        .lang-toggle:hover {
+            color: #000000;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .lang-toggle:hover {
+                color: #ffffff;
+            }
         }
     </style>
 </head>
@@ -106,16 +236,83 @@
     <div id="return-displays-container"></div>
     <div id="code-displays-container"></div>
 
-    <div class="content">
-        <h1>Endy Sun</h1>
+    <div class="header">
+        <img src="icon.png" alt="Icon" class="icon">
         <nav>
-            <a href="work.html" id="work-link">Work</a>
-            <a href="life.html">Life</a>
-            <a href="mind.html">Mind</a>
-            <a href="contact.html">Contact</a>
+            <a href="work.html" id="work-link" data-en="Work" data-zh="工作">Work</a>
+            <a href="life.html" data-en="Life" data-zh="生活">Life</a>
+            <a href="mind.html" data-en="Mind" data-zh="思想">Mind</a>
+            <a href="contact.html" data-en="Contact" data-zh="联系">Contact</a>
         </nav>
     </div>
 
+    <div class="top-controls">
+        <div class="theme-toggle" id="theme-toggle">☀</div>
+        <div class="lang-toggle" id="lang-toggle">A|文</div>
+    </div>
+
+    <div class="content">
+        <h1 id="main-title" data-en="Endy Sun" data-zh="孙博洋">Endy Sun</h1>
+    </div>
+
+    <script>
+        // Theme management (must be before main_work.js)
+        const themeToggle = document.getElementById('theme-toggle');
+        const mainTitle = document.getElementById('main-title');
+        const navLinks = document.querySelectorAll('nav a');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+        // Initialize theme from localStorage or system preference
+        let currentTheme = localStorage.getItem('theme') || (prefersDark.matches ? 'dark' : 'light');
+
+        function getCurrentTheme() {
+            return currentTheme;
+        }
+
+        function applyTheme(theme, isAnimating = false) {
+            const isDark = theme === 'dark';
+
+            // Set data-theme attribute
+            document.body.setAttribute('data-theme', theme);
+
+            themeToggle.textContent = isDark ? '☾' : '☀';
+
+            // Update title color
+            mainTitle.style.color = isDark ? '#ffffff' : '#000000';
+
+            // Update nav links color
+            navLinks.forEach(link => {
+                link.style.color = isDark ? '#999999' : '#666666';
+            });
+
+            // Update code display colors if they exist
+            const codeDisplays = document.querySelectorAll('.code-display');
+            codeDisplays.forEach(display => {
+                display.style.color = isDark ? '#eeeeee' : '#333333';
+            });
+        }
+
+        // Apply initial theme
+        applyTheme(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(currentTheme);
+            localStorage.setItem('theme', currentTheme);
+        });
+
+        // Language toggle
+        let currentLang = 'en';
+        const langToggle = document.getElementById('lang-toggle');
+
+        langToggle.addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            mainTitle.textContent = mainTitle.dataset[currentLang];
+            navLinks.forEach(link => {
+                link.textContent = link.dataset[currentLang];
+            });
+        });
+    </script>
     <script src="main_work.js"></script>
 </body>
 </html>
